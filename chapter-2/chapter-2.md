@@ -278,3 +278,65 @@ int bool_xor(int x, int y) {
 int bis(int x, int m);
 int bic(int x, int m);
 ```
+
+## problem 2.14
+
+Suppose that a and b have byte values 0x55 and 0x46, respectively. Fill in the
+following table indicating the byte values of the different C expressions:
+
+Expression        Value
+a & b             x044
+a | b             0x57
+~a | ~b           0xBB
+a & !b            0x00
+a && b            0x01
+a || b            0x01
+!a || !b          0x00
+a && ~b           0x01
+
+## prolbem 2.15
+
+[answer](./equal.c)
+
+## problem 2.16
+
+Fill in the table below showing the effects of the different shift operations on singlebyte
+quantities. The best way to think about shift operations is to work with binary
+representations. Convert the initial values to binary, perform the shifts, and then
+convert back to hexadecimal. Each of the answers should be 8 binary digits or 2
+hexadecimal digits.
+
+a
+
+Hex         Binary
+0xD4        1101 0100
+0x64        0110 0100
+0x72        0111 0010
+0x44        0100 0100
+
+a << 2
+
+Binary      Hex
+0101 0000   0x50
+1001 0000   0x90
+1100 1000   0xC8
+0001 0000   0x10
+
+a >> 3 (Logical)
+
+Binary      Hex
+0001 1010   0x1A
+0000 1100   0x0C
+0000 1110   0x0E
+0000 1000   0x08
+
+
+a >> 3 (Arithmetic)
+
+Binary      Hex
+1111 1010   0xFA
+0000 1100   0x0C
+0000 1110   0x0E
+0000 1000   0x08
+
+

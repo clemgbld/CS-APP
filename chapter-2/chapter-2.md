@@ -542,3 +542,12 @@ int strlonger(char *s, char *t) {
 return strlen(s) > strlen(t);
 }
 ```
+
+## problem 2.27
+
+/* Determine whether arguments can be added without overflow */
+```c
+int uadd_ok(unsigned x, unsigned y);
+```
+
+[answer](./uadd_ok.c)

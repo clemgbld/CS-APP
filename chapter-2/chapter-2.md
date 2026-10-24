@@ -415,3 +415,130 @@ C. [111100] -> -32 + 16 + 8 + 4 = -8
 Observe that the second and third bit vectors can be derived from the first by sign
 extension.
 
+## problem 2.23
+
+Consider the following C functions:
+
+```c
+int fun1(unsigned word) {
+return (int) ((word << 24) >> 24);
+}
+}
+int fun2(unsigned word) {
+return ((int) word << 24) >> 24;
+```
+
+
+Assume these are executed as a 32-bit program on a machine that uses two’s-
+complement arithmetic. Assume also that right shifts of signed values are per-
+formed arithmetically, while right shifts of unsigned values are performed logically.
+
+A. Fill in the following table showing the effect of these functions for several
+example arguments. You will find it more convenient to work with a hexa-
+decimal representation. Just remember that hex digits 8 through F have their
+most significant bits equal to 1.
+
+w             fun1(w)     fun2(w)
+0x00000076    0x00000076   0x00000076
+0x87654321    0x00000021   0x00000021
+0x000000C9    0x000000C9   0xFFFFFFC9
+0xEDCBA987    0x00000087   0xFFFFFF87
+
+
+B. Describe in words the useful computation each of these functions performs.
+
+fun1(w) -> extract the 8 lowest bits the resulting number will be between 0 and 255
+fun2(w) -> extract the 8 lowest bits as well but perform sign extension the number will be between -128 and 127.
+
+## problem 2.24
+
+Suppose we truncate a 4-bit value (represented by hex digits 0 through F)toa3-
+bit value (represented as hex digits 0 through 7.) Fill in the table below showing
+the effect of this truncation for some cases, in terms of the unsigned and two’s-
+complement interpretations of those bit patterns.  
+
+Unsigned
+
+1 -> 1
+3 -> 3
+5 -> 5
+12 -> 4
+14 -> 6
+
+Two's complement
+1 -> 1
+3 -> 3
+5 -> -3
+-4 -> -4
+-2 -> -2
+
+Explain how Equations 2.9 and 2.10 apply to these cases.
+
+For unsigned x mod 2^3.
+For two's complement U2T3(x mod 2^3).
+
+## problem 2.25
+
+Consider the following code that attempts to sum the elements of an array a, where
+the number of elements is given by parameter length:
+
+```c
+ /* WARNING: This is buggy code */
+ float sum_elements(float a[], unsigned length) {
+ int i;
+ float result = 0;
+
+ for (i = 0; i <= length-1; i++)
+ result += a[i];
+ return result;
+ }
+```
+
+When run with argument length equal to 0, this code should return 0.0.
+Instead, it encounters a memory error. Explain why this happens. 
+
+It happens because the number 0 - 1 overflow on the left for unsigned integer and become U_INTEGER_MAX which a very big number because it is all 32 bits turned to 1.
+and then the for loop execute and try to access the index of an empty array and then provoking a memory error.
+
+Show how this code can be corrected.
+
+(answer)[./sum_elements.c]
+
+## problem 2.26
+
+You are given the assignment of writing a function that determines whether one
+string is longer than another. You decide to make use of the string library function
+strlen having the following declaration:
+
+```c
+
+/* Prototype for library function strlen */
+size_t strlen(const char *s);
+Here is your first attempt at the function:
+/* Determine whether string s is longer than string t */
+/* WARNING: This function is buggy */
+int strlonger(char *s, char *t) {
+return strlen(s) - strlen(t) > 0;
+}
+```
+
+When you test this on some sample data, things do not seem to work quite
+right. You investigate further and determine that, when compiled as a 32-bit
+
+program, data type size_t is defined (via typedef) in header file stdio.h to be
+unsigned.
+A. For what cases will this function produce an incorrect result?
+
+When t is longer than s.
+
+B. Explain how this incorrect result comes about.
+
+Because when an unsigned integer become negative it overflow on the left and become a big number.
+
+C. Show how to fix the code so that it will work reliably.
+
+```c
+int strlonger(char *s, char *t) {
+return strlen(s) > strlen(t);
+}
+```

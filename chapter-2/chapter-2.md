@@ -684,3 +684,52 @@ u      6 110        6  110       12 001100      4 100
 t     -2 110       -2  110       4  000100     -4 100
 
 
+## problem 2.36
+
+You are given the assignment to develop code for a function tmult_ok that will
+determine whether two arguments can be multiplied without causing overflow.
+Here is your solution:
+
+```c
+/* Determine whether arguments can be multiplied without overflow */
+int tmult_ok(int x, int y) {
+int p = x*y;
+/* Either x is zero, or dividing p by x gives y */
+return !x || p/x == y;
+}
+```
+
+
+You test this code for a number of values of x and y, and it seems to work
+properly. Your coworker challenges you, saying, “If I can’t use subtraction to
+test whether addition has overflowed (see Problem 2.31), then how can you use
+division to test whether multiplication has overflowed?”
+Devise a mathematical justification of your approach, along the following
+lines. First, argue that the case x = 0 is handled correctly. Otherwise, consider
+w-bit numbers x (x ̸= 0), y, p, and q, where p is the result of performing two’s-
+complement multiplication on x and y, and q is the result of dividing p by x.
+
+1. Show that x . y, the integer product of x and y, can be written in the form
+x . y= p + t2w, where t ̸= 0 if and only if the computation of p overflows.
+
+x * y = p only and only t = 0 so if p overflow it has to be x * y = p +t2w
+
+2. Show that p can be written in the form p= x . q + r, where |r| < |x|.
+
+p / x = q + r if we take the formula in the code
+
+p = x * q + r
+
+3. Show that q= y if and only if r = t = 0. 
+
+x * y = x * q = y = q
+
+## 2.36
+
+For the case where data type int has 32 bits, devise a version of tmult_ok (Prob-
+lem 2.35) that uses the 64-bit precision of data type int64_t, without using
+division.
+
+[answer](./tmult_ok.c)
+
+

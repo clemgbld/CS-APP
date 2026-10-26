@@ -724,7 +724,7 @@ p = x * q + r
 
 x * y = x * q = y = q
 
-## 2.36
+## problem 2.36
 
 For the case where data type int has 32 bits, devise a version of tmult_ok (Prob-
 lem 2.35) that uses the 64-bit precision of data type int64_t, without using
@@ -732,4 +732,74 @@ division.
 
 [answer](./tmult_ok.c)
 
+## problem 2.37
+
+ou are given the task of patching the vulnerability in the XDR code shown in
+the aside on page 136 for the case where both data types int and size_t are 32
+bits. You decide to eliminate the possibility of the multiplication overflowing by
+computing the number of bytes to allocate using data type uint64_t. You replace
+
+the original call to malloc (line 9) as follows:
+
+```c
+uint64_t asize =
+ele_cnt * (uint64_t) ele_size;
+void *result = malloc(asize);
+
+```
+
+A. Recall that the argument to malloc has type size_t.
+Does your code provide any improvement over the original?
+
+No it doesn't because size_t is architecture dependent so if it is a 32 bits system the result will be the same.
+
+
+B. How would you change the code to eliminate the vulnerability?
+
+the right approach is to check if ele_cnt * ele_size is within SIZE_MIN and SIZE_MAX.
+
+```c
+uint64_t asize = ele_cnt * (uint64_t)  ele_size;
+
+size_t size = (size_t) asize;
+
+if(asize != size){
+  return NULL;
+}
+void *result = malloc(asize);
+
+```
+
+
+## problem 2.38
+
+As we will see in Chapter 3, the lea instruction can perform computations of
+the form (a<<k) + b, where k is either 0, 1, 2, or 3, and b is either 0 or some
+program value. The compiler often uses this instruction to perform multiplications
+by constant factors. For example, we can compute 3*a as (a<<1) + a.
+Considering cases where b is either 0 or equal to a, and all possible values of k,
+what multiples of a can be computed with a single lea instruction?
+
+1, 2 ,4, 8
+3,5,9
+
+## problem 2.39
+
+How could we modify the expression for form B for the case where bit position n
+is the most significant bit?
+
+-(x << m)
+
+## problem 2.40
+
+ For each of the following values of K, find ways to express x*K using only the
+specified number of operations, where we consider both additions and subtrac-
+tions to have comparable cost. You may need to use some tricks beyond the simple
+form A and B rules we have considered so far.
+
+K       Shifts    Add/Subs           Expression
+7       1           1                (x << 3) - x
+30      4           3                (x << 4) + (x << 3) + (x << 2<) + (x << 1)
+28      2           1                (x << 5) - (x << 2)
+55      2           2                (x << 6) - (x << 3) - x
 

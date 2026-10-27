@@ -803,3 +803,57 @@ K       Shifts    Add/Subs           Expression
 28      2           1                (x << 5) - (x << 2)
 55      2           2                (x << 6) - (x << 3) - x
 
+## problem 2.41
+
+For a run of ones starting at bit position n down to bit position m (n ≥ m), we saw
+that we can generate two forms of code, A and B. How should the compiler decide
+which form to use?
+
+Choose A when n = m else choose B.
+
+## problem 2.42
+
+Write a function div16 that returns the value x/16 for integer argument x. Your
+function should not use division, modulus, multiplication, any conditionals (if or
+?:), any comparison operators (e.g., <, >,or==), or any loops. You may assume
+that data type int is 32 bits long and uses a two’s-complement representation, and
+that right shifts are performed arithmetically.
+
+[answer](./div16.c)
+
+## problem 2.43
+
+In the following code, we have omitted the definitions of constants M and N:
+
+```c
+#define M /* Mystery number 1 */
+#define N /* Mystery number 2 */
+int arith(int x, int y) {
+int result = 0;
+result = x*M + y/N; /* M and N are mystery numbers. */
+return result;
+}
+```
+
+
+We compiled this code for particular values of M and N. The compiler opti-
+mized the multiplication and division using the methods we have discussed. The
+following is a translation of the generated machine code back into C:
+
+```c
+/* Translation of assembly code for arith */
+int optarith(int x, int y) {
+int t=x;
+x <<= 5;
+x-=t;
+if(y<0)y+=7;
+y >>= 3; /* Arithmetic shift */
+return x+y;
+}
+```
+
+
+What are the values of M and N?
+
+M = 31 and N = 8.
+

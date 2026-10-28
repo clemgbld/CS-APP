@@ -857,3 +857,91 @@ What are the values of M and N?
 
 M = 31 and N = 8.
 
+## problem 2.44
+
+Assume data type int is 32 bits long and uses a two’s-complement representation
+for signed values. Right shifts are performed arithmetically for signed values and
+logically for unsigned values. The variables are declared and initialized as follows:
+```c
+int x = foo(); int y = bar(); /* Arbitrary value */
+/* Arbitrary value */
+unsigned ux = x;
+unsigned uy = y;
+
+```
+For each of the following C expressions, either (1) argue that it is true (evalu-
+ates to 1) for all values of x and y, or (2) give values of x and y for which it is false
+(evaluates to 0):
+A. (x>0)||(x-1<0)
+False
+B. (x & 7) != 7 || (x<<29 < 0)
+True
+C. (x*x)>=0
+False
+D. x<0||-x<=0
+True
+E. x>0||-x>=0
+False
+F. x+y == uy+ux
+True
+G. x*~y + uy*ux == -x
+True
+
+## problem 2.45
+
+Fill in the missing information in the following table:
+
+3/4     0.11      0.75
+5/16    0.0101    0.3125
+43/16   10.1011   2.6875
+9/8     1.001     1.125
+47/8    101.111   5.875
+51/16   11.0011   3.1875
+
+## problem 2.46
+
+The imprecision of floating-point arithmetic can have disastrous effects. On Febru-
+ary 25, 1991, during the first Gulf War, an American Patriot Missile battery in
+Dharan, Saudi Arabia, failed to intercept an incoming Iraqi Scud missile. The
+Scud struck an American Army barracks and killed 28 soldiers. The US General
+Accounting Office (GAO) conducted a detailed analysis of the failure [76] and de-
+termined that the underlying cause was an imprecision in a numeric calculation.
+In this exercise, you will reproduce part of the GAO’s analysis.
+The Patriot system contains an internal clock, implemented as a counter
+that is incremented every 0.1 seconds. To determine the time in seconds, the
+program would multiply the value of this counter by a 24-bit quantity that was
+a fractional binary approximation to 1
+10 . In particular, the binary representation
+of 1
+10 is the nonterminating sequence 0.000110011[0011]...2, where the portion in
+brackets is repeated indefinitely. The program approximated 0.1, as a value x,by
+considering just the first 23 bits of the sequence to the right of the binary point:
+x = 0.00011001100110011001100. (See Problem 2.51 for a discussion of how they
+could have approximated 0.1 more precisely.)
+A. What is the binary representation of 0.1− x?
+
+0.000000000000000000000001100[1100]..2
+B. What is the approximate decimal value of 0.1− x?
+
+9.54 * 10^-8
+
+C. The clock starts at 0 when the system is first powered up and keeps counting
+
+0.343 seconds
+
+up from there. In this case, the system had been running for around 100 hours.
+What was the difference between the actual time and the time computed by
+the software?
+D. The system predicts where an incoming missile will appear based on its
+velocity and the time of the last radar detection. Given that a Scud travels
+at around 2,000 meters per second, how far off was its prediction?
+
+0.343 * 2000 around 687m
+
+Normally, a slight error in the absolute time reported by a clock reading would
+not affect a tracking computation. Instead, it should depend on the relative time
+between two successive readings. The problem was that the Patriot software had
+been upgraded to use a more accurate function for reading time, but not all of
+the function calls had been replaced by the new code. As a result, the tracking
+software used the accurate time for one reading and the inaccurate time for the
+other.

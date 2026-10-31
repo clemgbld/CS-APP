@@ -202,7 +202,10 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-    return 2;
+    int tmin = 1 << 31;
+    int minusX = (~x) + 1;
+    int minusEndBoundary = (~0x3a) + 1;
+    return !((((minusX + 0x2f) & tmin) ^ tmin) | (((minusEndBoundary + x) & tmin) ^ tmin));
   }
 /* 
  * conditional - same as x ? y : z 
@@ -225,7 +228,17 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  int tmin = 1 << 31;
+  int isXNeg = !((x & tmin) ^ tmin);
+  int isYNeg = !((y & tmin) ^ tmin);
+  int isYPos = !isYNeg;
+  int isXPos = !isXNeg;
+  int minusX = (~x) + 1;
+  int minusY = (~y) + 1;
+
+
+  return (isXNeg & isYPos);
+;
 }
 //4
 /* 
@@ -237,7 +250,7 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-    return 0;
+    return  0;
 
 }
 /* howManyBits - return the minimum number of bits required to represent x in

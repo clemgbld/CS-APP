@@ -229,7 +229,6 @@ int conditional(int x, int y, int z) {
  */
 int isLessOrEqual(int x, int y) {
   int tmin = 1 << 31;
-  int tmax = (1 << 31) ^ (~0);
   int isLessThanOrEqual = y + ((~x) + 1);
 
   int isXNeg = !((x & tmin) ^ tmin);
@@ -292,7 +291,29 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+  unsigned exp = uf & 0x7f800000;
+  int sign = uf & 0x80000000;
+  int frac = uf & 0x007fffff;
+  exp >>= 23;
+
+  if(exp >= 255){
+   return uf;
+  }
+
+  if(exp){
+    exp+= 1;
+    exp<<=23;
+  }else {
+    int newFrac= ((frac << 1) & 0x007fffff);
+    if(newFrac < frac){
+      exp = 1;
+      exp<<=23;
+    }
+    frac = newFrac;
+
+  }
+
+  return sign | exp | frac;
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f

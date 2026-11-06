@@ -328,7 +328,25 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+  int sign = uf & 0x80000000;
+  int isNeg = !!sign;
+  unsigned exp = uf & 0x7f800000;
+  int bigExp;
+  int result;
+  exp >>= 23;
+  bigExp = exp - 127;
+  if(bigExp < 0){
+    return 0;
+  }else if(bigExp > 30){
+    return 0x80000000u;
+  }
+
+  result = 1;
+  while(bigExp > 0){
+    result*= 2;
+    bigExp--;
+  }
+  return isNeg ? -result : result;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x

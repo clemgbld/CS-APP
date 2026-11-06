@@ -988,3 +988,155 @@ fill in entries marked —
 | `0 11 01` | — | — | — | — | — | — | NaN | — |
 | `0 11 10` | — | — | — | — | — | — | NaN | — |
 | `0 11 11` | — | — | — | — | — | — | NaN | — |
+
+## problem 2.48
+
+As mentioned in Problem 2.6, the integer 3,510,593 has hexadecimal represen-
+tation 0x00359141, while the single-precision floating-point number 3,510,593.0
+has hexadecimal representation 0x4A564504. Derive this floating-point represen-
+tation and explain the correlation between the bits of the integer and floating-point
+representations.
+
+0000 0000 0011 0101  1001  0001 0100 0001
+
+0100 1010 0101 0110  0100  0101 0000 0100
+
+The low order bits represent of 0x4A564504 represent 0x00359141
+
+## problem 2.49
+
+A) For a floating-point format with an n-bit fraction, give a formula for the
+smallest positive integer that cannot be represented exactly (because it
+would require an (n + 1)-bit fraction to be exact). Assume the exponent
+field size k is large enough that the range of representable exponents does
+not provide a limitation for this problem.
+
+(2^n + 1) + 1
+
+B) What is the numeric value of this integer for single-precision format (n =
+23)?
+
+2 ^24  + 1 = 16777217
+
+## problem 2.50
+
+Show how the following binary fractional values would be rounded to the nearest
+half (1 bit to the right of the binary point), according to the round-to-even rule.
+In each case, show the numeric values, both before and after rounding.
+
+A) 10.111 -> 2.875 -> 3 -> 11.00
+B) 11.010 -> 3.25 -> 3 -> 11.00
+C) 11.00 -> 3 -> 3 -> 11.00
+D) 10.110 -> 2.75 -> 3 -> 11.00
+
+## problem 2.51
+
+We saw in Problem 2.46 that the Patriot missile software approximated 0.1 as x =
+0.00011001100110011001100. Suppose instead that they had used IEEE round-
+to-even mode to determine an approximation x′ to 0.1 with 23 bits to the right of
+the binary point.
+
+A. What is the binary representation of x′?
+
+0.00011001100110011001101
+
+B. What is the approximate decimal value of x′
+
+2.38 * 10 ^-8
+
+C. How far off would the computed clock have been after 100 hours of opera-
+tion?
+
+2.38 * 10 ^-8 * 100 * 60 * 60 * 10 = 0.086
+
+D. How far off would the program’s prediction of the position of the Scud
+missile have been?
+− 0.1?
+
+0.086 * 2000 = 171 meters.
+
+## problem 2.52
+
+Consider the following two 7-bit floating-point representations based on the IEEE
+floating-point format. Neither has a sign bit—they can only represent nonnegative
+numbers.
+
+1. Format A
+There are k= 3 exponent bits. The exponent bias is 3.
+There are n = 4 fraction bits.
+
+2. Format B
+There are k= 4 exponent bits. The exponent bias is 7.
+There are n = 3 fraction bits.
+
+Below, you are given some bit patterns in format A, and your task is to convert
+them to the closest value in format B. If necessary, you should apply the round-to-
+even rounding rule. In addition, give the values of numbers given by the format A
+and format B bit patterns. Give these as whole numbers (e.g., 17) or as fractions
+(e.g., 17/64).
+
+101 1110 -> 15/2 -> 1001 111 -> 15/2
+010 1001 -> 25/32 -> 0110 100 -> 3/4
+110 1111 -> 31/2 -> 1011 000 -> 16
+000 0001 -> 1/64 -> 0001 000 -> 1/64
+
+## problem 2.53
+
+Fill in the following macro definitions to generate the double-precision values +∞,
+−∞, and−0:
+
+```c
+#define POS_INFINITY
+#define NEG_INFINITY
+#define NEG_ZERO
+```
+
+You cannot use any include files (such as math.h), but you can make use of the
+fact that the largest finite number that can be represented with double precision
+is around 1.8 × 10308.
+
+```c
+#define POS_INFINITY 1e40
+#define NEG_INFINITY (-POS_INFINITY)
+#define NEG_ZERO (-1/POS_INFINITY) 
+```
+
+## problem 2.54
+
+Assume variables x, f, and d are of type int, float, and double, respectively.
+Their values are arbitrary, except that neither f nor d equals +∞, −∞,orNaN.
+For each of the following C expressions, either argue that it will always be true
+(i.e., evaluate to 1) or give a value for the variables such that it is not true (i.e.,
+evaluates to 0).
+
+A. x == (int)(double) x
+
+True
+
+B. x == (int)(float) x
+
+False for Tmax
+
+C. d == (double)(float) d
+
+False 1e40
+
+D. f == (float)(double) f
+
+True
+
+E. f == -(-f)
+
+True
+
+F. 1.0/2 == 1/2.0
+
+True
+
+G. d*d >= 0.0
+
+True but might overflow
+
+H. (f+d)-f == d
+
+False for (1.2 + 0.6) + 1.2 gives 0.600000009 and not 0.6

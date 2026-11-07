@@ -362,5 +362,16 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+    int bias = 127;
+
+    if(x < -23){
+      return 0;
+    }
+    if(x > 127){
+      return 0x7f800000;
+    }
+    if(x >= 0){
+        return (x + 127) << 23;
+    }
+    return  0x00800000 >> -x;
 }

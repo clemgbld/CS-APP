@@ -153,4 +153,61 @@ leaq 0xE(,%rdx,3), %rax         3q + 14
 leaq 6(%rbx,%rdx,7), %rax       7q + p + 6
 
 
+## problem 3.7
 
+Consider the following code, in which we have omitted the expression being
+computed:
+
+```c
+short scale3(short x, short y, short z) {
+short t = ;
+return t;
+}
+```
+
+
+Compiling the actual function with gcc yields the following assembly code:
+
+short scale3(short x, short y, short z)
+
+x in %rdi, y in %rsi, z in %rdx
+
+```
+scale3:
+leaq (%rsi,%rsi,9), %rbx
+leaq (%rbx,%rdx), %rbx
+leaq (%rbx,%rdi,%rsi), %rbx
+ret
+```
+
+Fill in the missing expression in the C code.
+
+```c
+short scale3(short x, short y, short z) {
+short t = 10 * y + z + x * y;
+return t;
+}
+```
+
+## problem 3.8
+
+Assume the following values are stored at the indicated memory addresses and
+registers:
+
+Address    Value      Register     Value
+0x100      0xFF       %rax         0x100
+0x108      0xAB       %rcx         0x1
+0x110      0x13       %rdx         0x3
+0x118      0x11
+
+Fill in the following table showing the effects of the following instructions,
+in terms of both the register or memory location that will be updated and the
+resulting value:
+
+Instruction                Destination     Value
+addq %rcx,(%rax)           0x100           0x100
+subq %rdx,8(%rax)          0x108           0xA8
+imulq $16,(%rax,%rdx,8)    0x118           0xBB
+incq 16(%rax)              0x110           0x14
+decq %rcx                  %rcx            0x0
+subq %rdx,%rax             %rax            0xFD

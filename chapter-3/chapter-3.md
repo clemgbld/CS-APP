@@ -211,3 +211,89 @@ imulq $16,(%rax,%rdx,8)    0x118           0xBB
 incq 16(%rax)              0x110           0x14
 decq %rcx                  %rcx            0x0
 subq %rdx,%rax             %rax            0xFD
+
+## problem 3.9
+
+Suppose we want to generate assembly code for the following C function:
+
+```c
+long shift_left4_rightn(long x, long n)
+{
+x <<= 4;
+x >>= n;
+return x;
+}
+```
+
+The code that follows is a portion of the assembly code that performs the
+actual shifts and leaves the final value in register %rax. Two key instructions
+have been omitted. Parameters x and n are stored in registers %rdi and %rsi,
+respectively.
+
+long shift_left4_rightn(long x, long n)
+x in %rdi, n in %rsi
+
+shift_left4_rightn:
+movq %rdi, %rax     Get x
+shlq $4,   %rax     x << 4
+movl %esi, %ecx     Get n (4 bytes)
+sarq %cl, %rax     x >> n
+
+Fill in the missing instructions, following the annotations on the right. The
+right shift should be performed arithmetically.
+
+## problem 3.10
+
+Consider the following code, in which we have omitted the expression being
+computed:
+
+```c
+short arith3(short x, short y, short z)
+{
+short p1 = y | z;
+short p2 = p1 >> 9;
+short p3 = ~p2;
+short p4 = y - p3;
+return p4;
+}
+```
+
+The portion of the generated assembly code implementing these expressions
+is as follows:
+
+short arith3(short x, short y, short z)
+x in %rdi, y in %rsi, z in %rdx
+arith3:
+orq %rsi, %rdx
+sarq $9, %rdx
+notq %rdx
+movq %rdx, %bax
+subq %rsi, %rbx
+ret
+
+Based on this assembly code, fill in the missing portions of the C code.
+
+## problem 3.11
+
+It is common to find assembly-code lines of the form
+xorq %rcx,%rcx
+
+in code that was generated from C where no exclusive-or operations were
+present.
+
+A. Explain the effect of this particular exclusive-or instruction and what useful
+operation it implements.
+
+It implements a bitwise operation non exclusive or with a register and itself (eg. x ^ x).
+
+B. What would be the more straightforward way to express this operation in
+assembly code?
+
+movq $0, rcx
+
+C. Compare the number of bytes to encode any two of these three different
+implementations of the same operation.
+
+
+xorq %rcx,%rcx -> 3 bytes 
+movq $0, rcx -> 7 bytes

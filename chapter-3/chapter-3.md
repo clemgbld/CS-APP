@@ -297,3 +297,116 @@ implementations of the same operation.
 
 xorq %rcx,%rcx -> 3 bytes 
 movq $0, rcx -> 7 bytes
+
+## problem 3.12
+
+Consider the following function for computing the quotient and remainder of two
+unsigned 64-bit numbers:
+
+void uremdiv(unsigned long x, unsigned long y,
+unsigned long *qp, unsigned long *rp) {
+unsigned long q = x/y;
+unsigned long r = x%y;
+*qp=q;
+*rp=r;
+}
+
+Modify the assembly code shown for signed division to implement this function.
+
+1 remdiv:
+2 movq %rdx, %r8
+3 movq %rdi, %rax
+4 movl $0, %edx
+5 divq %rsi
+6 movq %rax, (%r8)
+7 movq %rdx, (%rcx)
+8 ret
+
+
+## problem 3.13
+
+The C code
+
+```c
+int comp(data_t a, data_t b) {
+return a COMP b;
+}
+```
+
+
+shows a general comparison between arguments a and b, where data_t, the data
+type of the arguments, is defined (via typedef) to be one of the integer data types
+listed in Figure 3.1 and either signed or unsigned. The comparison COMP is defined
+via #define.
+Suppose a is in some portion of %rdx while b is in some portion of %rsi.For
+each of the following instruction sequences, determine which data types data_t
+and which comparisons COMP could cause the compiler to generate this code.
+(There can be multiple correct answers; you should list them all.)
+
+
+A. cmpl %esi, %edi
+setl %al
+
+data_t = int 
+COMP = <
+
+B. cmpw %si, %di
+setge %al
+
+data_t = short
+COMP = >=
+
+C. cmpb %sil, %dil
+setbe %al
+
+data_t =  unsigned char
+COMP = <=
+
+D. cmpq %rsi, %rdi
+setne %al
+
+data_t = long, char *, unsigned long
+COMP = !=
+
+
+## problem 3.14
+
+The C code
+
+```c
+int test(data_t a) {
+return a TEST 0;
+}
+```
+
+shows a general comparison between argument a and 0, where we can set the
+data type of the argument by declaring data_t with a typedef, and the nature
+of the comparison by declaring TEST with a #define declaration. The following
+instruction sequences implement the comparison, where a is held in some portion
+of register %rdi. For each sequence, determine which data types data_t and which
+comparisons TEST could cause the compiler to generate this code. (There can be
+multiple correct answers; list all correct ones.)
+
+A. testq  %rdi, %rdi
+setge %al
+
+data_t = long
+TEST = >=
+
+B. testw  %di, %di
+sete %al
+
+TEST = ==
+data_t = short, unsigned short
+
+C. testb  %dil, %dil
+seta %al
+
+data_t = unsigned char
+TEST =  >
+
+D. testl  %edi, %edi
+setle %al
+
+data_t = int
+TEST = <=

@@ -410,3 +410,165 @@ setle %al
 
 data_t = int
 TEST = <=
+
+## problem 3.15
+
+In the following excerpts from a disassembled binary, some of the information has
+been replaced by X’s. Answer the following questions about these instructions.
+c
+A. What is the target of the je instruction below? (You do not need to know
+anything about the callq instruction here.)
+
+4003fa: 74 02 je  4003fe <loop+0x2>
+4003fc: ff d0 callq *%rax
+
+B. What is the target of the je instruction below?
+40042f: 74 f4 je 400425 <loop+0xf4>
+400431: 5d pop %rbp
+
+C. What is the address of the ja and pop instructions?
+400543: 77 02 ja 400547
+400545 5d pop %rbp
+
+D. In the code that follows, the jump target is encoded in PC-relative form as a 4-
+byte two’s-complement number. The bytes are listed from least significant to
+most, reflecting the little-endian byte ordering of x86-64. What is the address
+of the jump target?
+
+4005e8: e9 73 ff ff ff jmpq 400560 <loop+0xff73>
+4005ed: 90 nop
+
+## problem 3.16
+
+When given the C code
+
+```c
+void cond(short a, short *p)
+{
+if (a && *p < a)
+*p=a;
+}
+```
+
+gcc generates the following assembly code:
+
+void cond(short a, short *p)
+a in %rdi, p in %rsi
+
+cond:
+testq %rdi, %rdi
+je .L1
+cmpq %rsi, (%rdi)
+jle .L1
+movq %rdi, (%rsi)
+.L1:
+rep; ret
+
+A. Write a goto version in C that performs the same computation and mimics
+the control flow of the assembly code, in the style shown in Figure 3.16(b).
+You might find it helpful to first annotate the assembly code as we have done
+in our examples.
+
+```c
+void cond(short a, short*p){
+  if(a == 0){
+    goto L1;
+  }
+  if(a <= *p){
+    goto L1;
+  }
+  *p=a; 
+  L1:
+    return;
+}
+```
+
+B. Explain why the assembly code contains two conditional branches, even
+though the C code has only one if statement.
+
+Because we need first to check if a is not zero and then if a <= *p in assembly that can't be done in one operation.
+
+## problem 3.17
+
+An alternate rule for translating if statements into goto code is as follows:
+
+```c
+t=test-expr;
+if (t)
+goto true;
+else-statement
+goto done;
+true:
+then-statement
+done:
+```
+
+A) Rewrite the goto version of absdiff_se based on this alternate rule.
+
+```c
+long gotodiff_se(long x, long y){
+  long result;
+  if(x < y){
+    goto x_l_y;
+  }else{
+     ge_cnt++;
+    result = x - y;
+    return result;
+   goto x_ge_y;
+  }
+  x_l_y:
+    lt_cnt++;
+    result = y - x;
+    return result;
+}
+```
+
+B) Can you think of any reasons for choosing one rule over the other?
+
+The choice is purely arbitrary i would say.
+
+## problem 3.18
+
+Starting with C code of the form
+```c
+short test(short x, short y, short z) {
+  short val = (y + z) - x;
+    if (z > 5){
+      if (y <= 2)
+        val = x / y;
+      else
+      val = x / z;
+    } else if (z < 3)
+      val = z / y;
+    return val;
+}
+```
+
+
+gcc generates the following assembly code:
+
+short test(short x, short y, short z)
+x in %rdi, y in %rsi, z in %rdx
+test:
+leaq (%rdx,%rsi), %rax
+subq %rdi, %rax
+cmpq $5, %rdx
+jle .L2
+cmpq $2, %rsi
+jle .L3
+movq %rdi, %rax
+idivq %rdx, %rax
+ret
+.L3:
+movq %rdi, %rax
+idivq %rsi, %rax
+ret
+.L2:
+cmpq $3, %rdx
+jge .L4
+movq %rdx, %rax
+idivq %rsi, %rax
+.L4:
+rep; ret
+
+Fill in the missing expressions in the C code.

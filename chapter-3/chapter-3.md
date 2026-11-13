@@ -662,3 +662,13 @@ ret
 Fill in the missing expressions in the C code.
 
 
+## problem 3.22
+
+
+A) Try to calculate 14! with a 32-bit int. Verify whether the computation of 14! overflows.
+
+Yes it overflows tested in ./fact_do.c
+
+B) What if the computation is done with a 64-bit long int?
+
+It doesn't overflow in that case.

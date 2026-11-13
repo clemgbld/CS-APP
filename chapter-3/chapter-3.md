@@ -572,3 +572,93 @@ idivq %rsi, %rax
 rep; ret
 
 Fill in the missing expressions in the C code.
+
+## problem 3.19
+
+Running on a new processor model, our code required around 45 cycles when the
+branching pattern was random, and around 25 cycles when the pattern was highly
+predictable.
+
+A. What is the approximate miss penalty?
+2(45 - 25) = 40
+
+B. How many cycles would the function require when the branch is mispre-
+dicted?
+
+25 + 40 = 65
+
+## problem 3.20
+
+In the following C function, we have left the definition of operation OP incomplete:
+
+```c
+#define OP /* Unknown operator */
+short arith(short x) {
+return x OP 16;
+}
+```
+
+When compiled, gcc generates the following assembly code:
+
+short arith(short x)
+x in %rdi
+arith:
+leaq 15(%rdi), %rbx  # add 15 for negative numbers
+testq %rdi, %rdi   # test x 
+cmovns %rdi, %rbx  # if x is positive don't add 15
+sarq $4, %rbx  # x >> 4
+ret
+
+A) What operation is OP?
+
+```c
+#define OP /* Unknown operator */
+short arith(short x) {
+return x / 16;
+}
+```
+
+B) Annotate the code to explain how it works.
+
+## problem 3.21
+Starting with C code of the form
+
+```c
+short test(short x, short y) {
+short val = 12 + y;
+  if (x < 0){
+    if (x >= y)
+      val = x | y;
+    else
+      val = x * y;
+  } else if (y >= 10)
+      val = x / y;
+  return val;
+}
+```
+
+gcc generates the following assembly code:
+
+short test(short x, short y)
+  x in %rdi, y in %rsi
+
+test:
+leaq 12(%rsi), %rbx
+testq %rdi, %rdi
+jge .L2
+movq %rdi, %rbx
+imulq %rsi, %rbx
+movq %rdi, %rdx
+orq %rsi, %rdx
+cmpq %rsi, %rdi
+cmovge %rdx, %rbx
+ret
+.L2:
+idivq %rsi, %rdi
+cmpq $10, %rsi
+cmovge %rdi, %rbx
+ret
+
+Fill in the missing expressions in the C code.
+
+

@@ -672,3 +672,178 @@ Yes it overflows tested in ./fact_do.c
 B) What if the computation is done with a 64-bit long int?
 
 It doesn't overflow in that case.
+
+
+## problem 3.23
+
+For the C code
+
+```c
+short dw_loop(short x) {
+short y = x/9;
+short *p = &x;
+short n = 4*x;
+do {
+x+=y;
+(*p) += 5;
+n-=2;
+} while (n > 0);
+return x;
+}
+```
+
+gcc generates the following assembly code:
+
+short dw_loop(short x)
+x initially in %rdi
+1 dw_loop:
+2 movq %rdi, %rbx  #stays x
+3 movq %rdi, %rcx #int y
+4 idivq $9, %rcx #y = x / 9;
+5 leaq (,%rdi,4), %rdx # int n = 4 * x;
+6 .L2: # do
+7 leaq 5(%rbx,%rcx), %rbx x+= 5 + y;
+8 subq $2, %rdx   #n-= 2
+9 testq %rdx, %rdx #while(n > 0)
+10 jg .L2
+11 rep; ret # return x
+
+A) Which registers are used to hold program values x, y, and n?
+
+%rcx holds y, %rdx holds n, %rbx holds x
+
+B) How has the compiler eliminated the need for pointer variable p and the
+pointer dereferencing implied by the expression (*p)+=5?
+
+it does it in one operation leaq 5(%rbx,%rcx), %rbx aka x+= 5 + y
+
+
+the compiler do it in one shot
+
+C) Add annotations to the assembly code describing the operation of the pro-
+gram, similar to those shown in Figure 3.19(c).
+
+## problem 3.24
+
+For C code having the general form
+
+```c
+short loop_while(short a, short b)
+{
+short result = 0;
+while (a > b){
+  result = result + (a * b);
+  a= a - 1;
+}
+return result;
+}
+```
+
+gcc, run with command-line option -Og, produces the following code:
+
+short loop_while(short a, short b)
+a in %rdi, b in %rsi
+1 loop_while:
+2 movl $0, %eax
+3 jmp .L2
+4 .L3:
+5 leaq (,%rsi,%rdi), %rdx
+6 addq %rdx, %rax
+7 subq $1, %rdi
+8 .L2:
+9 cmpq %rsi, %rdi
+10 jg .L3
+11 rep; ret
+
+We can see that the compiler used a jump-to-middle translation, using the jmp
+instruction on line 3 to jump to the test starting with label .L2. Fill in the missing
+parts of the C code.
+
+## problem 3.25
+
+ For C code having the general form
+
+```c
+long loop_while2(long a, long b)
+{
+long result = b;
+while (b > 0){
+  result = a * result;
+  b= b - a;
+}
+return result;
+}
+```
+
+gcc, run with command-line option -O1, produces the following code:
+a in %rdi, b in %rsi
+1 loop_while2:
+2 testq %rsi, %rsi
+3 jle .L8
+4 movq %rsi, %rax
+5 .L7:
+6 imulq %rdi, %rax
+7 subq %rdi, %rsi
+8 testq %rsi, %rsi
+9 jg .L7
+10 rep; ret
+11 .L8:
+12 movq %rsi, %rax
+13 ret
+
+We can see that the compiler used a guarded-do translation, using the jle
+instruction on line 3 to skip over the loop code when the initial test fails. Fill in
+the missing parts of the C code. Note that the control structure in the assembly
+code does not exactly match what would be obtained by a direct translation of the
+C code according to our translation rules. In particular, it has two different ret
+instructions (lines 10 and 13). However, you can fill out the missing portions of
+the C code in a way that it will have equivalent behavior to the assembly code.
+
+## problem 3.26
+
+ A function test_one has the following overall structure:
+```c
+short test_one(unsigned short x) {
+  short val = 1;
+  while (x != 0) {
+  val^= x;
+  x>>= 1;
+  }
+  return val & 0;
+}
+```
+
+ The gcc C compiler generates the following assembly code:
+short test_one(unsigned short x)
+x in %rdi
+
+test_one:
+movl $1, %eax
+jmp .L5
+.L6:
+xorq %rdi, %rax
+shrq %rdi 
+.L5:
+testq %rdi, %rdi
+jne .L6
+andl $0, %eax
+ret
+
+Reverse engineer the operation of this code and then do the following:
+
+A) Determine what loop translation method was used.
+
+It is a classic while loop translation.
+
+B) Use the assembly-code version to fill in the missing parts of the C code.
+
+C) Describe in English what this function computes.
+
+it computes the parity of the argument x.
+
+## problem 3.27
+
+Write goto code for a function called fibonacci to print fibonacci numbers using
+a while loop. Apply the guarded-do transformation.
+
+./fib.c

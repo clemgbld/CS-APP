@@ -847,3 +847,241 @@ Write goto code for a function called fibonacci to print fibonacci numbers using
 a while loop. Apply the guarded-do transformation.
 
 ./fib.c
+
+## problem 3.28
+
+A function test_two has the following overall structure:
+
+```c
+short test_two(unsigned short x) {
+short val = 0;
+short i;
+for(i = 64;i != 0;i--){
+  val= (val << 1) | x & 0x1;
+  x>>= 1;
+}
+return val;
+}
+```
+
+The gcc C compiler generates the following assembly code:
+
+test fun_b(unsigned test x)
+x in %rdi
+1 test_two:
+2 movl $1, %edx
+3 movl $65, %eax
+4 .L10:
+5 movq %rdi, %rcx
+6 andl $1, %ecx
+7 addq %rax, %rax
+8 orq %rcx, %rax
+9 shrq %rdi Shift right by 1
+10 addq $1, %rdx
+11 jne .L10
+12 rep; ret
+
+Reverse engineer the operation of this code and then do the following:
+
+A) Use the assembly-code version to fill in the missing parts of the C code.
+
+B) Explain why there is neither an initial test before the loop nor an initial jump to the test portion of the loop.
+
+Because the loop stop when i is equal at O after an operation.
+
+C) Describe in English what this function computes.
+
+It reverse the bits in x.
+
+## problem 3.29
+
+Executing a continue statement in C causes the program to jump to the end of
+the current loop iteration. The stated rule for translating a for loop into a while
+loop needs some refinement when dealing with continue statements. For example,
+consider the following code:
+
+```c
+/* Example of for loop containing a continue statement */
+/* Sum even numbers between 0 and 9 */
+long sum = 0;
+long i;
+for (i = 0; i < 10; i++) {
+if (i & 1)
+continue;
+sum += i;
+}
+```
+
+A) What would we get if we naively applied our rule for translating the for loop
+into a while loop? What would be wrong with this code?
+
+It would loop forever because we need to update  i before using going back at the beginning of the loop.
+
+B) How could you replace the continue statement with a goto statement to
+ensure that the while loop correctly duplicates the behavior of the for loop?
+
+```c
+long sum = 0;
+long i = 0;
+
+loop:
+if(i >= 10){
+  goto done;
+}
+if(i & 1){
+  goto continue;
+}
+sum+= i;
+continue:
+  i++;
+goto loop;
+
+done:
+
+```
+
+## problem 3.30
+
+In the C function that follows, we have omitted the body of the switch statement.
+In the C code, the case labels did not span a contiguous range, and some cases had
+multiple labels.
+
+```c
+void switch2(short x, short *dest) {
+short val = 0;
+switch (x) {
+.
+.
+.
+Body of switch statement omitted
+}
+*dest = val;
+}
+```
+
+
+In compiling the function, gcc generates the assembly code that follows for
+the initial part of the procedure, with variable x in %rdi
+
+void switch2(short x, short *dest)
+x in %rdi
+1 switch2:
+2 addq $2, %rdi
+3 cmpq $8, %rdi
+4 ja .L2
+5 jmp *.L4(,%rdi,8)
+
+
+It generates the following code for the jump table:
+
+1 .L4:
+2 .quad .L9 # -2
+3 .quad .L5 # - 1
+4 .quad .L6 # 0
+5 .quad .L7 # 1
+6 .quad .L2 # 2
+7 .quad .L7 # 3
+8 .quad .L8 # 4
+9 .quad .L2 # 5
+10 .quad .L5 # 6
+
+Based on this information, answer the following questions:
+
+What were the values of the case labels in the switch statement?
+
+for the range -2 >= x <= 6:
+
+```c
+switch (x) {
+ case -2:
+    ....
+  case -1:
+  case 6:
+    ....
+  case 0:
+    ...
+  case 1:
+  case 3:
+    ...
+  case 4:
+    ...
+  default: 
+    ...
+
+}
+```
+
+
+What cases had multiple labels in the C code?
+
+case: -1, 6
+case 1, 3
+
+## problem 3.31
+
+For a C function switcher with the general structure
+
+```c
+void switcher(long a, long b, long c, long *dest)
+{
+long val;
+switch(a) {
+case 5: /*CaseA*/
+c= b ^ 15;
+/* Fall through */
+case 0: /*CaseB*/
+val = 112 + c;
+break;
+case 2: /*CaseC*/
+case 7: /*CaseD*/
+val = (b + c) * 4;
+break;
+case 4: /*CaseE*/
+val = a;
+break;
+default:
+val = b;
+}
+*dest = val;
+}
+```
+
+gcc generates the assembly code and jump table shown in Figure 3.24.
+Fill in the missing parts of the C code. Except for the ordering of case labels
+C and D, there is only one way to fit the different cases into the template.
+
+(a) Code
+void switcher(long a, long b, long c, long *dest)
+a in %rsi, b in %rdi, c in %rdx, d in %rcx
+
+1 switcher:
+2 cmpq $7, %rdi
+3 ja .L2
+4 jmp *.L4(,%rdi,8)
+5 .section .rodata
+6 .L7:
+7 xorq $15, %rsi
+8 movq %rsi, %rdx
+9 .L3:
+10 leaq 112(%rdx), %rdi
+11 jmp .L6
+12 .L5:
+13 leaq (%rdx,%rsi), %rdi
+14 salq $2, %rdi
+15 jmp .L6
+16 .L2:
+17 movq %rsi, %rdi
+18 .L6:
+19 movq %rdi, (%rcx)
+20 ret
+
+(b) Jump table
+1 .L4:
+2 .quad .L3 # 0
+3 .quad .L2 # 1 default
+4 .quad .L5 # 2
+5 .quad .L2 # 3 default
+6 .quad .L6 # 4
+7 .quad .L7 # 5
+8 .quad .L2 # 6 default
+9 .quad .L5 # 7

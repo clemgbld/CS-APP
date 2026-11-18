@@ -1128,4 +1128,75 @@ L3    0x400547  retq           9               11       99   0x7fffffffe810     
 F4    0x400555  repz retq      9               11       99   0x7fffffffe818      0x400565    return 99 from first
 M2    0x400565  mov            9               11       99   0x7fffffffe820      -           Resume
 
+## problem 3.33
 
+A C function procprob has four arguments u, a, v, and b. Each is either a signed
+number or a pointer to a signed number, where the numbers have different sizes.
+The function has the following body:
+
+```c
+*u += a;
+*v += b;
+return sizeof(a) + sizeof(b);
+```
+
+It compiles to the following x86-64 code:
+
+1 procprob:
+2 movslq %edi, %rdi
+3 addq %rdi, (%rdx)
+4 addb %sil, (%rcx)
+5 movl $6, %eax
+6 ret
+
+Determine a valid ordering and types of the four parameters. There are two
+correct answers.
+
+int procprob(int a, short b,  long *u, char *v);
+
+## problem 3.34
+
+Consider a function P, which generates local values, named a0–a8. It then calls
+function Q using these generated values as arguments. Gcc produces the following
+code for the first part of P:
+
+ long P(long x)
+x in %rdi
+1 P:
+2 pushq %r15
+3 pushq %r14
+4 pushq %r13
+5 pushq %r12
+6 pushq %rbp
+7 pushq %rbx
+8 subq $24, %rsp
+9 movq %rdi, %rbx
+10 leaq 1(%rdi), %r15
+11 leaq 2(%rdi), %r14
+12 leaq 3(%rdi), %r13
+13 leaq 4(%rdi), %r12
+14 leaq 5(%rdi), %rbp
+15 leaq 6(%rdi), %rax
+16 movq %rax, (%rsp)
+17 leaq 7(%rdi), %rdx
+18 movq %rdx, 8(%rsp)
+19 movl $0, %eax
+20 call Q
+
+A) Identify which local values get stored in callee-saved registers.
+
+x is saved into %rbx
+x + 1 saved in %r15
+x + 2 saved in %r14
+x + 3 saved in %r13
+x + 4 saved in %r12
+x + 5 saved in %rbp
+
+B) Identify which local values get stored on the stack.
+x + 6 saved on the stack at %rsp - 24
+x + 7 saved on the stack at %rsp - 16
+
+C) Explain why the program could not store all of the local values in callee-
+saved registers
+
+Because there are only 6 callee-saved registers

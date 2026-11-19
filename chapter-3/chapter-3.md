@@ -1236,3 +1236,44 @@ A) What value does rfun store in the callee-saved register %rbx?
 it stores the value of x.
 
 B) Fill in the missing expressions in the C code shown above.
+
+## problem 3.36
+
+Consider the following declarations:
+
+```c
+int P[5];
+short Q[2];
+int **R[9];
+double *S[10];
+short *T[2];
+
+```
+
+Fill in the following table describing the element size, the total size, and the
+address of element i for each of these arrays.
+
+Array  Element size     Total size   Start address     Element i
+P      4                20           xp                xp + 4i
+Q      2                4            xq                xq + 2i
+R      8                72           xr                xr + 8i
+S      8                80           xs                xs + 8i
+T      8                16           xt                xt + 8i
+
+## problem 3.37
+
+Suppose xP, the address of short integer array P, and long integer index i are stored
+in registers %rdx and %rcx, respectively. For each of the following expressions, give
+its type, a formula for its value, and an assembly-code implementation. The result
+should be stored in register %rax if it is a pointer and register element %ax if it has
+data type short.
+
+Expression        Type      Value            Assembly code
+```c
+P[1]              short     M[xp + 2]        movw  2(%rdx), %ax
+P+3+i             short *   xp + 6 + 2i      leaq  6(%rdx,%rcx,2), %rax
+P[i*6-5]          short     M[xp + 12i - 10] movw  -10(%rdx,rcx, 12), %ax
+P[2]              short     M[xp + 4]        movw  4(%rdx), %ax
+&P[i + 2]         short *   xp + 2i + 4      leaq  4(%rdx, rcx, 2), %rax
+```
+

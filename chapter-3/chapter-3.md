@@ -1200,3 +1200,39 @@ C) Explain why the program could not store all of the local values in callee-
 saved registers
 
 Because there are only 6 callee-saved registers
+
+## problem 3.35
+
+For a C function having the general structure
+
+```c
+long rfun(unsigned long x) {
+if (x == 0)
+return 0;
+unsigned long nx = x >> 2;
+long rv = rfun(nx);
+return x + rv;
+}
+```
+
+gcc generates the following assembly code:
+long rfun(unsigned long x)
+x in %rdi
+1 rfun:
+2 pushq %rbx
+3 movq %rdi, %rbx
+4 movl $0, %eax
+5 testq %rdi, %rdi
+6 je .L2
+7 shrq $2, %rdi
+8 call rfun
+9 addq %rbx, %rax
+10 .L2:
+11 popq %rbx
+12 ret
+
+A) What value does rfun store in the callee-saved register %rbx?
+
+it stores the value of x.
+
+B) Fill in the missing expressions in the C code shown above.

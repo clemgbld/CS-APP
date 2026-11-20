@@ -1532,3 +1532,57 @@ up->t2.a[up->t1.u]  int           movl  (%rdi), %rax
 *up->t2.p     char              movl 8(%rdi), %rax
                                 movb (rax), %al
                                 movb %al, (%rsi) 
+
+## problem 3.44
+
+For each of the following structure declarations, determine the offset of each field,
+the total size of the structure, and its alignment requirement for x86-64:
+
+A) struct P1 { short i; int c; int *j; short *d; };
+
+```c
+
+i = 0 ->  c = 2 ->  j = 6 -> d = 14 ->  padding = 22 -> 2;
+```
+
+total size 24
+
+B) 
+```c
+
+struct P2 { int i[2]; char c[8]; short s[4]; long *j; };
+```
+
+i2 = 0 -> c8 = 8 -> s4 = 16 -> j = 24 ->  32
+
+total size 32 
+
+C)
+```c
+
+struct P3 { long w[2]; int *c[2] };
+```
+
+w2[2] = 0 -> c = 16 -> 32
+
+total size 32 
+
+D) 
+```c
+
+struct P4 { char w[16]; char *c[2] };
+```
+
+w[16] = 0 -> c = 16 -> 32
+
+total size 32
+
+E)
+
+```c
+struct P5 { struct P4 a[2]; struct P1 t };
+```
+
+a[2] = 0 -> t = 64 -> 88 
+
+total size 88

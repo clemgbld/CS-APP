@@ -1363,3 +1363,115 @@ void fix_set_diag(fix_matrix A, int val) {
     }while(Aptr != AEnd);
 }
 ```
+
+## problem 4.41
+
+Consider the following structure declaration:
+
+```c
+struct test {
+short *p;
+struct {
+  short x;
+  short y;
+  }s;
+struct test *next;
+};
+
+```
+This declaration illustrates that one structure can be embedded within another,
+just as arrays can be embedded within structures and arrays can be embedded
+within arrays.
+The following procedure (with some expressions omitted) operates on this
+structure:
+
+```c
+void st_init(struct test *st) {
+st->s.y = ;
+st->p = ;
+st->next = ;
+}
+```
+
+A)  What are the offsets (in bytes) of the following fields?
+p: 0
+s.x: 8
+s.y: 10
+next: 12
+
+B) How many total bytes does the structure require?
+
+8 + 2 + 2 + 8 = 20 bytes
+
+C) he compiler generates the following assembly code for st_init:
+
+void st_init(struct test *st)
+st in %rdi
+1 st_init:
+2 movl 8(%rdi), %eax
+3 movl %eax, 10(%rdi)
+4 leaq 10(%rdi), %rax
+5 movq %rax, (%rdi)
+6 movq %rdi, 12(%rdi)
+7 ret
+
+On the basis of this information, fill in the missing expressions in the code
+for st_init.
+
+```c
+void st_init(struct test *st) {
+st->s.y = st->s.x;
+st->p = &(st->s.y);
+st->next = st;
+}
+```
+
+## problem 3.42
+
+The following code shows the declaration of a structure of type ACE and the
+prototype for a function test:
+
+```c
+struct ACE {
+short v;
+struct ACE *p;
+};
+
+short test(struct ACE *ptr)
+```
+
+When the code for fun is compiled, gcc generates the following assembly
+code:
+
+short test(struct ACE *ptr)
+ptr in %rdi
+1 test:
+2 movl $1, %eax
+3 jmp .L2
+4 .L3:
+5 imulq (%rdi), %rax
+6 movq 2(%rdi), %rdi
+7 .L2:
+8 testq %rdi, %rdi
+9 jne .L3
+10 rep; ret
+
+A) Use your reverse engineering skills to write C code for test.
+
+```c
+
+short test(struct ACE *ptr){
+  short result = 1;
+
+  while(ptr){
+    result*= ptr->v;
+    ptr = ptr->p;
+  }
+  return result;
+}
+```
+
+B) Describe the data structure that this structure implements and the operation
+performed by test
+
+The data structure is a linked list and test performs the products of all the element of the linked list.

@@ -1475,3 +1475,60 @@ B) Describe the data structure that this structure implements and the operation
 performed by test
 
 The data structure is a linked list and test performs the products of all the element of the linked list.
+
+## problem 3.43
+
+Suppose you are given the job of checking that a C compiler generates the proper
+code for structure and union access. You write the following structure declaration:
+
+```c
+typedef union {
+  struct {
+  long u;
+  short v;
+  char w;
+  } t1;
+  struct {
+  int a[2];
+  char *p;
+  } t2;
+} u_type;
+```
+
+You write a series of functions of the form
+
+```c
+void get(u_type *up, type *dest) {
+*dest = expr;
+}
+```
+
+ith different access expressions expr and with destination data type type set
+according to type associated with expr. You then examine the code generated
+when compiling the functions to see if they match your expectations.
+
+Suppose in these functions that up and dest are loaded into registers %rdi and
+%rsi, respectively. Fill in the following table with data type type and sequences of
+one to three instructions to compute the expression and store the result at dest.
+
+expr           type             Code
+up->t1.u       long             movq (%rdi), %rax
+                                movq %rax, (%rsi)
+
+up->t1.v       short            movl $0, %eax
+                                movw 8(%rdi), %ax
+                                movq %rax, (%rsi)
+
+&up->t1.w      * char           addq $10 , %rdi
+                                movq %rdi , (%rsi) 
+
+up->t2.a       * int a          movq  %rdi, (%rsi) 
+
+up->t2.a[up->t1.u]  int           movl  (%rdi), %rax
+                                movl  (%rdi, %rax, 4), %eax
+                                movl  %eax , (%rsi) 
+
+
+*up->t2.p     char              movl 8(%rdi), %rax
+                                movb (rax), %al
+                                movb %al, (%rsi) 

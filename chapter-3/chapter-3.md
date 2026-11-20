@@ -1308,3 +1308,58 @@ on this assembly code
 
 M = 5
 N = 7
+
+## problem 3.39
+
+Use Equation 3.1 to explain how the computations of the initial values for Aptr,
+Bptr, and Bend in the C code of Figure 3.37(b) (lines 3–5) correctly describe their
+computations in the assembly code generated for fix_prod_ele (lines 3–5).
+
+Aptr initial value = xa + 4(16 * i)
+Bptr initial value =  xb + 4 * k;
+BEnd initial value = xb + 4k + 16 * 16
+
+## problem 3.40
+
+The following C code sets the diagonal elements of one of our fixed-size arrays to
+val:
+
+```c
+/* Set all diagonal elements to val */
+void fix_set_diag(fix_matrix A, int val) {
+long i;
+for(i=0;i<N;i++)
+  A[i][i] = val;
+}
+```
+
+When compiled with optimization level -O1, gcc generates the following
+assembly code:
+
+1 fix_set_diag:
+void fix_set_diag(fix_matrix A, int val)
+A in %rdi, val in %rsi
+2 movl $0, %eax
+3 .L13:
+4 movl %esi, (%rdi,%rax)
+5 addq $68, %rax
+6 cmpq $1088, %rax
+7 jne .L13
+8 rep; ret
+
+Create a C code program fix_set_diag_opt that uses optimizations similar
+to those in the assembly code, in the same style as the code in Figure 3.37(b). Use
+expressions involving the parameter N rather than integer constants, so that your
+code will work correctly if N is redefined.
+
+```c
+/* Set all diagonal elements to val */
+void fix_set_diag(fix_matrix A, int val) {
+    int *Aptr = &A[0][0];
+    int *AEnd = &A[N][N];
+    do {
+     *Aptr = val;
+     Aptr+= 1 + N;
+    }while(Aptr != AEnd);
+}
+```

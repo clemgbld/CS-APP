@@ -1586,3 +1586,50 @@ struct P5 { struct P4 a[2]; struct P1 t };
 a[2] = 0 -> t = 64 -> 88 
 
 total size 88
+
+## problem 3.45
+
+Answer the following for the structure declaration
+
+```c
+struct {
+int *a;
+float b;
+char c;
+short d;
+long e;
+double f;
+int g;
+char *h;
+} rec;
+```
+
+A) What are the byte offsets of all the fields in the structure?
+
+a = 0 -> b = 8 -> c = 12 -> padding = 13 -> d = 16 -> e = 18 -> f = 26 -> g = 34 -> padding = 38 -> h = 42 -> 50 -> padding 56
+
+B) What is the total size of the structure?
+
+Total size = 48 bytes
+
+C) Rearrange the fields of the structure to minimize wasted space, and then
+show the byte offsets and total size for the rearranged structure.
+
+```c
+struct {
+int *a;
+char *h;
+long e;
+double f;
+float b;
+int g;
+short d;
+char c;
+} rec;
+```
+
+
+a = 0 -> h = 8 -> e = 16 -> f = 24 -> b = 32 -> g = 36 -> d = 40 -> c = 42 -> padding -> 48
+
+
+Total size = 48 bytes

@@ -1633,3 +1633,58 @@ a = 0 -> h = 8 -> e = 16 -> f = 24 -> b = 32 -> g = 36 -> d = 40 -> c = 42 -> pa
 
 
 Total size = 48 bytes
+
+## problem 3.46
+
+Figure 3.41 shows a (low-quality) implementation of a function that reads a line
+from standard input, copies the string to newly allocated storage, and returns a
+pointer to the result.
+
+Consider the following scenario. Procedure get_line is called with the return
+address equal to 0x400776 and register %rbx equal to 0x0123456789ABCDEF.You
+type in the string
+
+0123456789012345678901234
+
+The program terminates with a segmentation fault. You run gdb and determine
+that the error occurs during the execution of the ret instruction of get_line.
+
+A) Fill in the diagram that follows, indicating as much as you can about the stack
+just after executing the instruction at line 3 in the disassembly. Label the
+quantities stored on the stack (e.g., “Return address”) on the right, and their
+hexadecimal values (if known) within the box. Each box represents 8 bytes.
+Indicate the position of %rsp. Recall that the ASCII codes for characters 0–9
+are 0x30–0x39.
+
+
+0123456789012345678901234
+
+00 00 00 00 00 40 00 76  return address
+0x0123456789ABCDEF %rbx
+-                       
+-                       <- buf
+
+
+
+B) Modify your diagram to show the effect of the call to gets (line 5).
+
+0x00    00   00   00   00   40  00 34
+0x33 0x32 0x31 0x30 0x39 0x38 0x37 0x36
+0x35 0x34 0x33 0x32 0x31 0x30 0x39 0x38
+0x37 0x36 0x35 0x34 0x33 0x32 0x31 0x30
+
+
+C) To what address does the program attempt to return?
+
+0x0000000000400034
+
+D) What register(s) have corrupted value(s) when get_line returns?
+
+register %rbx has been corrupted and is now: 
+0x33 0x32 0x31 0x30 0x39 0x38 0x37 0x36
+
+E) Besides the potential for buffer overflow, what two other things are wrong
+with the code for get_line
+
+- it should have check that the call to malloc does not return a null pointer
+- should have been strlen(buf) + 1 for the call to malloc to take into account the string terminator character \00.

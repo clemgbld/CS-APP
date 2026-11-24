@@ -1688,3 +1688,94 @@ with the code for get_line
 
 - it should have check that the call to malloc does not return a null pointer
 - should have been strlen(buf) + 1 for the call to malloc to take into account the string terminator character \00.
+
+## problem 3.47
+
+Running our stack-checking code 10,000 times on a system running Linux ver-
+sion 2.6.16, we obtained addresses ranging from a minimum of 0xffffb754 to a
+maximum of 0xffffd754.
+
+
+A) What is the approximate range of addresses?
+
+d - b = 2 * 16 ^ 3 = around 2 ^ 13
+
+B) If we attempted a buffer overrun with a 128-byte nop sled, about how many
+attempts would it take to test all starting addresses?
+
+128 bytes = 2 ^ 7
+
+2 ^ 13 - 2 ^ 7 = 2 ^ 6 = 64
+
+## problem 3.48
+
+The functions intlen, len, and iptoa provide a very convoluted way to compute
+the number of decimal digits required to represent an integer. We will use this as
+a way to study some aspects of the gcc stack protector facility.
+
+```c
+int len(char *s) {
+return strlen(s);
+}
+
+void iptoa(char *s, long *p) {
+long val = *p;
+sprintf(s, "%ld", val);
+}
+
+int intlen(long x) {
+long v;
+char buf[12];
+v=x;
+iptoa(buf, &v);
+return len(buf);
+}
+```
+
+The following show portions of the code for intlen, compiled both with and
+without stack protector:
+(a) Without protector
+
+int intlen(long x)
+x in %rdi
+1 intlen:
+2 subq $40, %rsp
+3 movq %rdi, 24(%rsp)
+4 leaq 24(%rsp), %rsi
+5 movq %rsp, %rdi
+6 call iptoa
+
+(b) With protector
+
+int intlen(long x)
+x in %rdi
+1 intlen:
+2 subq $56, %rsp
+3 movq %fs:40, %rax
+4 movq %rax, 40(%rsp)
+5 xorl %eax, %eax
+6 movq %rdi, 8(%rsp)
+7 leaq 8(%rsp), %rsi
+8 leaq 16(%rsp), %rdi
+9 call iptoa
+
+A) For both versions: What are the positions in the stack frame for buf, v, and
+(when present) the canary value?
+
+For version 1 (without stack detection mechanism):
+
+buf = %rsp - 40
+val = %rsp - 16
+no canary value
+
+For version 2 (with stack detection mechanism)
+
+canary value = rsp - 16
+val = rsp - 48
+buf = rsp - 40
+
+
+B) How does the rearranged ordering of the local variables in the protected
+code provide greater security against a buffer overrun attack?
+
+Overriding buf does not override val.

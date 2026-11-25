@@ -1779,3 +1779,36 @@ B) How does the rearranged ordering of the local variables in the protected
 code provide greater security against a buffer overrun attack?
 
 Overriding buf does not override val.
+
+## problem 3.49
+
+A) Explain, in mathematical terms, the logic in the computation of s2 on lines
+5–7. Hint: Think about the bit-level representation of−16 and its effect in
+the andq instruction of line 6
+
+it's like doing:
+
+%rax = 22 + %rdi * 8
+
+%rsp = %rax - (%rax % 16)
+
+B) Explain, in mathematical terms, the logic in the computation of p on lines
+8–10. Hint: You may want to refer to the discussion on division by powers
+of 2 in Section 2.3.7.
+
+it like doing:
+
+%rax = (%rsp + 7) / 8
+
+C) For the following values of n and s1, trace the execution of the code to
+determine what the resulting values would be for s2, p, e1, and e2
+
+
+n   s1      s2     p             e1      e2
+5 2,065    2017   2024            1      7      
+6 2,064    2000   2000            16       0
+
+D) What alignment properties does this code guarantee for the values of s2
+and p?
+
+s2 is padded so that p + (n * 8) is aligned on 8.

@@ -1812,3 +1812,72 @@ D) What alignment properties does this code guarantee for the values of s2
 and p?
 
 s2 is padded so that p + (n * 8) is aligned on 8.
+
+## problem 3.50
+
+For the following C code, the expressions val1–val4 all map to the program values
+i, f, d, and l:
+
+```c
+double fcvt2(int *ip, float *fp, double *dp, long l)
+{
+  int i = *ip; float f = *fp; double d = *dp;
+  *ip = (int) val1;
+  *fp = (float) val2;
+  *dp = (double) val3;
+  return (double) val4;
+}
+```
+
+Determine the mapping, based on the following x86-64 code for the function:
+
+double fcvt2(int *ip, float *fp, double *dp, long l)
+ip in %rdi, fp in %rsi, dp in %rdx, l in %rcx
+Result returned in %xmm0
+
+fcvt2:
+movl (%rdi), %eax
+vmovss (%rsi), %xmm0
+vcvttsd2si (%rdx), %r8d
+movl %r8d, (%rdi)
+vcvtsi2ss %eax, %xmm1, %xmm1
+vmovss %xmm1, (%rsi)
+vcvtsi2sdq %rcx, %xmm1, %xmm1
+vmovsd %xmm1, (%rdx)
+vunpcklps %xmm0, %xmm0, %xmm0
+vcvtps2pd %xmm0, %xmm0
+ret
+
+```c
+double fcvt2(int *ip, float *fp, double *dp, long l)
+{
+  int i = *ip; float f = *fp; double d = *dp;
+  *ip = (int) d;
+  *fp = (float) i;
+  *dp = (double) l;
+  return (double) f;
+}
+```
+
+## problem 3.51
+
+The following C function converts an argument of type src_t to a return value of
+type dst_t, where these two types are defined using typedef:
+
+```c
+dest_t cvt(src_t x)
+{
+dest_t y = (dest_t) x;
+return y;
+}
+```
+
+For execution on x86-64, assume that argument x is either in %xmm0 or in
+the appropriately named portion of register %rdi (i.e., %rdi or %edi). One or two instructions are to be used to perform the type conversion and to copy the value to the appropriately named portion of register %rax (integer result) or %xmm0 (floating-point result). Show the instruction(s), including the source and destination registers.
+
+Tx        Ty       Instructions
+long      double   vctsi2sdq  %rdi , %xmm0
+double    int      vcttsd2dsi %xmm0 ,%eax
+double    float    vctsd2ss %xmm0, %xmm0, %xmm0
+long      float    vctsi2ssq %rdi, %xmm0, %xmm0
+float     long     vcttss2siq %xmm0, %rax

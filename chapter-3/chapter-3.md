@@ -1881,3 +1881,84 @@ double    int      vcttsd2dsi %xmm0 ,%eax
 double    float    vctsd2ss %xmm0, %xmm0, %xmm0
 long      float    vctsi2ssq %rdi, %xmm0, %xmm0
 float     long     vcttss2siq %xmm0, %rax
+
+## problem 3.52
+
+For each of the following function declarations, determine the register assignments
+for the arguments:
+
+A) double g1(double a, long b, float c, int d);
+
+%xmm0, %rdi, %xmm1, %esi
+
+B) double g2(int a, double *b, float *c, long d);
+
+%edi, %rsi, %rdx, %rcx 
+
+C) double g3(double *a, double b, int c, float d);
+
+%rdi, %xmm0, %esi, %xmm1
+
+D) double g4(float a, int *b, float c, double d);
+
+%xmm0, %rdi, %xmm1, %xmm2
+
+## problem 3.53
+
+For the following C function, the types of the four arguments are defined by
+typedef:
+
+```c
+double funct1(arg1_t p, arg2_t q, arg3_t r, arg4_t s)
+{
+return p/(q+r) - s;
+}
+```
+
+When compiled, gcc generates the following code:
+
+double funct1(arg1_t p, arg2_t q, arg3_t r, arg4_t s)
+vcvtsi2ssq %rsi, %xmm2, %xmm2 # convert quad word (second normal register) to float
+vaddss %xmm0, %xmm2, %xmm0 # add float + converted quad word to float
+vcvtsi2ss %edi, %xmm2, %xmm2 # convert int (first normal register) to float
+vdivss %xmm0, %xmm2, %xmm0  #  converted int to float /  float
+vunpcklps %xmm0, %xmm0, %xmm0
+vcvtps2pd %xmm0, %xmm0 # convert result to double
+vsubsd %xmm1, %xmm0, %xmm0 # result / double (second floating point argument)
+ret
+
+Determine the possible combinations of types of the four arguments (there
+may be more than one).
+
+there are:
+%edi = int
+%rsi = long
+%xmm0 = float
+%xmm1 = double
+
+combinations:
+
+double funct1(int p, long  q, float r, double s)
+double funct1(int p, float  q, long r, double s)
+
+## problem 3.54
+
+Function funct2 has the following prototype:
+
+double funct2(double w, int x, float y, long z);
+
+Gcc generates the following code for the function:
+
+double funct2(double w, int x, float y, long z)
+w in %xmm0, x in %edi, y in %xmm1, z in %rsi
+funct2:
+vcvtsi2ss %edi, %xmm2, %xmm2
+vmulss %xmm1, %xmm2, %xmm1
+vunpcklps   %xmm1, %xmm1, %xmm1
+vcvtps2pd   %xmm1, %xmm2
+vcvtsi2sdq  %rsi, %xmm1, %xmm1
+vdivsd      %xmm1, %xmm0, %xmm0
+vsubsd      %xmm0, %xmm2, %xmm0
+ret
+
+Write a C version of funct2.

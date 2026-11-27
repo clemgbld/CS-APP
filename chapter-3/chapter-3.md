@@ -1962,3 +1962,11 @@ vsubsd      %xmm0, %xmm2, %xmm0
 ret
 
 Write a C version of funct2.
+
+```c
+double funct2(double w, int x, float y, long z){
+  return (x * y) - (w / z);
+}
+```
+
+

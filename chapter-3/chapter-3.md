@@ -1981,3 +1981,69 @@ High order bytes = 0x40400000
 exp = 1028 - 1023  = 5
 
 2^5 = 32
+
+## problem 3.56
+
+Consider the following C function, where EXPR is a macro defined with #define:
+
+```c
+double simplefun(double x) {
+return EXPR(x);
+}
+```
+
+Below, we show the AVX2 code generated for different definitions of EXPR,
+where value x is held in %xmm0. All of them correspond to some useful operation on
+floating-point values. Identify what the operations are. Your answers will require
+you to understand the bit patterns of the constant words being retrieved from
+memory.
+
+A) 1 vmovsd .LC1(%rip), %xmm1
+2 vandpd %xmm1, %xmm0, %xmm0
+3 .LC1:
+4 .long 4294967295
+5 .long 2147483647
+6 .long 0
+7 .long 0
+
+The goal is basically to do an and with 0x7fffffffffffffff to make the double positive.
+
+
+```c
+double simplefun(double x) {
+return x & 0x7fffffffffffffff;
+}
+
+```
+
+
+B) vxorpd %xmm0, %xmm0, %xmm0
+
+The goal is to return  zero by doing a xor of x with itself.
+
+
+```c
+double simplefun(double x) {
+return x ^ x;
+}
+
+```
+
+C. 
+1 vmovsd .LC2(%rip), %xmm1
+2 vxorpd %xmm1, %xmm0, %xmm0 
+3.LC2:
+4 .long 0
+5 .long -2147483648
+6 .long 0
+7 .long 0
+
+The goal is basically to do a xor with 0x8000000000000000 to inverse the sign of x.
+
+
+```c
+double simplefun(double x) {
+return x ^ 0x8000000000000000;
+}
+
+```

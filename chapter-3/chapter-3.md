@@ -1969,4 +1969,15 @@ double funct2(double w, int x, float y, long z){
 }
 ```
 
+## problem 3.55
 
+Show how the numbers declared at label .LC3 encode the number 32.0.
+
+Low order bytes = 0x0
+High order bytes = 0x40400000
+
+0x404 = 1028
+
+exp = 1028 - 1023  = 5
+
+2^5 = 32
